@@ -1,0 +1,122 @@
+---
+title: "Business Analytics"
+author: "Matt Rissler"
+date: "`r format(Sys.Date())`"
+output: 
+  ioslides_presentation:
+    keep_md: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, cache=TRUE)
+library(network)
+library(sna)
+library(ggnetwork)
+library(tidyverse)
+library(forcats)
+library(grid)
+```
+
+## The Major
+
+```{r PreReqs, include=FALSE}
+courses <- c("MAT 150", "ACC 227", "BUS 230", "BUS 240", "BUS 350", "CIT 115",
+             "CIT 225", "CIT 321", "CIT 340", "MAT 220", "BAN 210", "BAN 220", 
+             "BAN 330", "BAN 340", "BAN 450", "BAN 460", "BAN 490")
+n<-network.initialize(17)
+network.vertex.names(n)<- courses
+
+
+ locations<-matrix(
+   c( 0.15, 0.25,   0.75, 0.3,   0.85, 0.525,   0.75, 0.75,   1, 1,   0.5, 0.25,
+      0.45, 1,    1, 1.5,    .5, 1.7,   0.15, 1,    0.65, 1.75,   1, 2.2,
+      0, 2.05,   0.85, 2.5,    0.85, 2.5,   0.3, 2.5,        0.5, 4), 
+   ncol=2, byrow = TRUE)
+PreReqs <- data.frame(needed_id= parse_factor(c("MAT 150", "CIT 115",
+                                                "ACC 227", "BUS 230", "BUS 240",
+                                                "MAT 220", "CIT 115",
+                                                "CIT 115",
+                                                "CIT 225",
+                                                "CIT 225",
+                                                "BAN 210", "BUS 240",
+                                                "BAN 210", "BAN 330", "BAN 340"
+                                                ),
+                                   courses), 
+                      for_id=    parse_factor(c(rep("MAT 220",2),
+                                                rep("BAN 340", 3),
+                                                rep("BAN 330",2),
+                                                "CIT 225",
+                                                "CIT 340",
+                                                "BAN 460",
+                                                rep("BAN 450",2),
+                                                rep("BAN 490",3)
+                                                ),
+                                   courses),
+                      
+                      stringsAsFactors = FALSE
+                      )
+
+add.edges(n, PreReqs$needed_id,PreReqs$for_id)
+```
+
+
+
+
+```{r plotNetwork, dependson=PreReqs}
+net<-ggnetwork(n, layout=locations)
+ 
+g <- rasterGrob(colorRampPalette(c("mediumpurple1", "yellow"))(8), 
+                width=unit(1,"npc"), height = unit(1,"npc"), 
+                interpolate = TRUE) 
+ggplot(net, aes(x = x, y = y, xend = xend, yend = yend))+
+  annotation_custom(g, xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf) +
+  geom_edges(arrow = arrow(length = unit(7, "pt")), 
+             curvature=0.1, size=0.75)+
+  geom_nodes()+
+  geom_segment(aes(x=x,y=y,xend=xend,yend=yend  ),
+               data=tibble(x=c(-0.17), y=c(0), xend=c(-0.17), yend=c(1)),
+               arrow=arrow(length = unit(7, "pt") ) )+
+  annotate("text", x=-.23, y=.5, label="Time") +
+  geom_nodelabel(aes(label=vertex.names))+
+  expand_limits(x=c(-.15,1.05))+
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        legend.key = element_blank(),
+        panel.background = element_blank(),
+        panel.border = element_blank(),
+        panel.grid = element_blank()
+        ) 
+  
+```
+
+## Rotation of Classes
+
+If a class does not appear, it is offered every semester.
+```{r When, results="asis"}
+class_schedule <- data_frame(Code = courses,
+                       
+                       Title = c("Calc I", "Managerial Accounting", 
+                                 "Principles of Management", "Principles of Marketing",
+                                 "Principles of Finance", "Programming and Design Basics",
+                                 "Data Structures and Algorithms", "Data Analysis",
+                                 "Machine Learning", "Prob/Stats",
+                                 "Essentials of Analytics", "Data Visualization",
+                                 "Intro to Data Science", "Innovation",
+                                 "Marketing Analytics", "Big Data Analytics",
+                                 "Discovery"), 
+                       
+                       Semester = c("Every", "Every","Every","Every", "Every", "Every",
+                                    "Every", "Springs", "Even Springs", "Springs", "Every", "Springs", 
+                                    "Odd Falls", "Springs", "Falls", "Odd Springs", "Springs")
+                       )
+                       
+class_schedule %>% filter(Semester != "Every") %>% slice(1:4) %>%  knitr::kable()
+
+```
+
+## Rotation of Classes
+
+```{r rotation2, results="asis"}
+class_schedule %>% filter(Semester != "Every") %>% slice(5:n()) %>%  knitr::kable()
+```
