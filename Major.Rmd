@@ -28,9 +28,9 @@ network.vertex.names(n)<- courses
 
 
  locations<-matrix(
-   c( 0.15, 0.25,   0.75, 0.3,   0.85, 0.525,   0.75, 0.75,   1, 1,   0.5, 0.25,
-      0.45, 1,    1, 1.5,    .5, 1.7,   0.15, 1,    0.65, 1.75,   1, 2.2,
-      0, 2.05,   0.85, 2.5,    0.85, 2.5,   0.3, 2.5,        0.5, 4), 
+   c( 0.15, 0.25,   0.85, 0.3,   0.85, 1.55,   0.75, 1.25,   1, 1,   0.5, 0.25,
+      0.45, 1,    1, 1.5,    .3, 2.9,   0.15, 1,    0.65, 0.75,   1, 2.2,
+      0, 2.35,   0.9, 3,    0.65, 3.4,   0.45, 3.4,        0.5, 4), 
    ncol=2, byrow = TRUE)
 PreReqs <- data.frame(needed_id= parse_factor(c("MAT 150", "CIT 115",
                                                 "ACC 227", "BUS 230", "BUS 240",
@@ -67,7 +67,7 @@ net<-ggnetwork(n, layout=locations)
  
 g <- rasterGrob(colorRampPalette(c("mediumpurple1", "yellow"))(8), 
                 width=unit(1,"npc"), height = unit(1,"npc"), 
-                interpolate = TRUE) 
+                interpolate = FALSE) 
 ggplot(net, aes(x = x, y = y, xend = xend, yend = yend))+
   annotation_custom(g, xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf) +
   geom_edges(arrow = arrow(length = unit(7, "pt")), 
