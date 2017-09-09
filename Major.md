@@ -13,6 +13,10 @@ Matt Rissler
 
 ![](Major_files/figure-html/plotNetwork-1.png)<!-- -->
 
+## All? the Worst Cases
+![](Major_files/figure-html/worstCase-1.png)<!-- -->
+
+
 ## Rotation of Classes
 
 If a class does not appear, it is offered every semester.

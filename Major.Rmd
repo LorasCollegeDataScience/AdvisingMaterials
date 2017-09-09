@@ -64,6 +64,7 @@ add.edges(n, PreReqs$needed_id,PreReqs$for_id)
 
 ```{r plotNetwork, dependson=PreReqs}
 net<-ggnetwork(n, layout=locations)
+
  
 g <- rasterGrob(colorRampPalette(c("mediumpurple1", "yellow"))(8), 
                 width=unit(1,"npc"), height = unit(1,"npc"), 
@@ -89,6 +90,50 @@ ggplot(net, aes(x = x, y = y, xend = xend, yend = yend))+
         ) 
   
 ```
+
+## All? the Worst Cases
+```{r worstCase, dependson=PreReqs}
+add.vertices(n, 2, vattr=list(list(vertex.names= "MAT 113"),list(vertex.names= "MAT 117")))
+courses <- c(courses, "MAT 113", "MAT 117")
+add.edge(n, parse_factor(c("MAT 113"),courses), parse_factor(c("MAT 117"),courses ))
+add.edge(n, parse_factor(c("MAT 117"),courses), parse_factor(c("MAT 150"),courses ))
+add.edge(n, parse_factor(c("MAT 117"),courses), parse_factor(c("CIT 115"),courses ))
+
+
+locations<-matrix(
+   c( 0.25, 1.25,   0.85, 2.25,   0.7, 2.25,   0.53, 2.25,   1, 3.75,   0, 1.25,
+      0, 2.25,    0.75, 3.75,    .15, 2.75,   0.25, 1.75,    0.45, 2.75,   0.25, 3.75,
+      0.25, 2.25,   0.8, 2.75,    0.56, 3.25,   0.05, 3.25,        0.5, 3.75,  0.25, 0.25,
+      0.25, 0.75), 
+   ncol=2, byrow = TRUE)
+net<-ggnetwork(n, layout=locations)
+ 
+g <- rasterGrob(colorRampPalette(c("mediumpurple1", "yellow"))(8), 
+                width=unit(1,"npc"), height = unit(1,"npc"), 
+                interpolate = FALSE) 
+ggplot(net, aes(x = x, y = y, xend = xend, yend = yend))+
+  annotation_custom(g, xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf) +
+  geom_edges(arrow = arrow(length = unit(7, "pt")), 
+             curvature=0.1, size=0.75)+
+  geom_nodes()+
+  geom_segment(aes(x=x,y=y,xend=xend,yend=yend  ),
+               data=tibble(x=c(-0.17), y=c(0), xend=c(-0.17), yend=c(1)),
+               arrow=arrow(length = unit(7, "pt") ) )+
+  annotate("text", x=-.23, y=.5, label="Time") +
+  annotate("text", x=-.23, y=0, label="Odd Fall")+
+  geom_nodelabel(aes(label=vertex.names))+
+  expand_limits(x=c(-.15,1.05), y=c(0,1))+
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        legend.key = element_blank(),
+        panel.background = element_blank(),
+        panel.border = element_blank(),
+        panel.grid = element_blank()
+        ) 
+  
+```
+
 
 ## Rotation of Classes
 
